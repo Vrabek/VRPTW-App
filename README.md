@@ -2,16 +2,16 @@
 
 Do gotowego algorytmu dodałem trzy metody GET:
 
-- solution_cost_json - zwraca wynik algorytmu ("zminimalizowany koszt")
+*- solution_cost_json - zwraca wynik algorytmu ("zminimalizowany koszt")*
 
-typ: int 
-Przykładowy wynik: 71
+- typ: int 
+- Przykładowy wynik: 71
 
 
-- solution_routes_json - zwraca listę pojazd oraz liste zwiedzonych przez niego punktów
+*- solution_routes_json - zwraca listę pojazd oraz liste zwiedzonych przez niego punktów*
 
-typ: słownik
-Przykładowy wynik:
+- typ: słownik
+- Przykładowy wynik:
 {
     "Vehicle 1": [
         0,
@@ -30,10 +30,10 @@ Przykładowy wynik:
     ]
 }
 
-- solution_full_json - zwraca wszystkie dane tj. wynik algorytmu, czas końcowy, czas dla poszczególnych tras i dokładniejszy opis tracy pojazdów
+*- solution_full_json - zwraca wszystkie dane tj. wynik algorytmu, czas końcowy, czas dla poszczególnych tras i dokładniejszy opis tracy pojazdów*
 
-typ: słownik
-Przykładowy wynik:
+- typ: słownik
+- Przykładowy wynik:
 {
     "Final cost": 71,
     "Total time": 82,
