@@ -1,4 +1,4 @@
-"""Vehicles Routing Problem (VRP) with Time Windows."""
+"""Vehicles Routing Problem (VRP) with Time Windows backend service."""
 
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
