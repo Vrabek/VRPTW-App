@@ -2,7 +2,7 @@
 
 from VRPT import create_data_model, VRPTW_Algorithm, solution_cost_json, solution_routes_json, solution_full_json, calculate_distance_matrix
 import streamlit as st
-
+import matplotlib.pyplot as plt
 
 
 # uploaded_file = st.file_uploader("Choose a file")
@@ -152,12 +152,73 @@ if st.checkbox('Dodawanie punktu'):
 #    #continue
 #    st.session_state.data_model['time_matrix'][coord_x][coord_y]=czas
 
+    # arr = np.random.normal(1, 1, size=100)
+    # fig, ax = plt.subplots()
+    # ax.hist(arr, bins=20)
+
 
 #BUTTON Oblicz trasy
 if st.button('Oblicz trasy'):
+
+
     data = create_data_model()
 
+    points_coords = st.session_state.data_model['point_coords']
 
+    json = solution_routes_json()
+    print(json)
+    
+    #col = get_N_HexCol(len(json))
+    col='bgrcmyk'
+    colors = {vehicle: col[idx] for idx, vehicle in enumerate(json)}
+
+    fig, ax = plt.subplots()
+
+    for vehicle, route in json.items():
+        prev_point=-1
+        for point in route:
+            if prev_point>=0:
+                #print(points_coords[point])
+                #print(points_coords)
+                ax.scatter(points_coords[point][0],points_coords[point][1], c=colors[vehicle], label=vehicle)
+                ax.annotate(point, (points_coords[point][0], points_coords[point][1]), color=colors[vehicle])
+
+                plt.arrow(points_coords[prev_point][0], points_coords[prev_point][1], points_coords[point][0]-points_coords[prev_point][0],points_coords[point][1]-points_coords[prev_point][1], width = 0.01, label=vehicle,color=colors[vehicle])
+
+
+
+                prev_point=point
+
+            else:
+                ax.scatter(points_coords[point][0], points_coords[point][1], label=vehicle, c=colors[vehicle])
+                prev_point=point
+
+        #plt.plot(x,y,label=vehicle)
+        
+
+        #ax.scatter(z, y)
+
+        #plt.arrow(2, 4, 2, 2, width = 0.05)
+
+    #plt.legend()
+    st.pyplot(fig)
+
+#1232312
+    # y = [2.56422, 3.77284, 3.52623, 3.51468, 3.02199]
+    # z = [0.15, 0.3, 0.45, 0.6, 0.75]
+    # label = [58, 651, 393, 203, 123]
+
+    # 
+    # 
+
+    # for i, txt in enumerate(n):
+    #     ax.annotate(txt, (z[i], y[i])
+
+    #ax.annotate(n[1], (z[1], y[1]), xytext=(z[1]-0.05, y[1]-0.3), 
+    #arrowprops = dict(  arrowstyle="->",
+    #                    connectionstyle="angle3,angleA=0,angleB=-90"))
+
+    # 
 
     
 #TODO BUTTON eksport tras
@@ -179,6 +240,7 @@ if st.button('solution_cost_json'):
 
 if st.button('solution_routes_json'):
     json = solution_routes_json()
+    print(json)
     st.write(json)
 
 
