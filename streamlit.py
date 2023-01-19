@@ -1,8 +1,11 @@
 """Vehicles Routing Problem (VRP) with Time Windows streamlit."""
 
 from VRPT import create_data_model, VRPTW_Algorithm, solution_cost_json, solution_routes_json, solution_full_json, calculate_distance_matrix
+from io import StringIO
 import streamlit as st
 import matplotlib.pyplot as plt
+import json as js
+import numpy as np
 
 
 # uploaded_file = st.file_uploader("Choose a file")
@@ -36,11 +39,57 @@ if 'data_model' not in st.session_state:
     st.session_state.data_model = create_data_model()
 
 
+#TODO FIELD Wstaw plik
+def check_data_validity(data):
+    
+    rules = [ isinstance(data, dict),
+             isinstance(data['num_vehicles'], int),
+             isinstance(data['point_coords'], np.ndarray),
+             isinstance(data['time_windows'], list),
+             data['num_vehicles'] > 0,
+             len(data['point_coords']) == len(data['time_windows']),
+              ]
+
+    if all(rules):
+        return True
+    else:
+        return False
+
+uploaded_file = st.file_uploader("📥 Importuj dane", 
+help=' Przykład poprawnie przygotowanych danych: {"point_coords": [[0,0],[4,-4],[4,4]],"time_windows": [[0, 5], [7, 12], [10, 15]],"num_vehicles": 3,"depot": 0}')
+if uploaded_file is not None:
+    # To read file as bytes:
+    try:
+
+        # To convert to a string based IO:
+        stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+        string_data = stringio.read()
+        data_dict = js.loads(string_data)
+
+        st.write(data_dict)
+
+        data_dict['time_matrix'] = calculate_distance_matrix(data_dict['point_coords'])
+        data_dict['time_windows'] = [tuple(x) for x in data_dict['time_windows']] #back to list of tuples
+        temp_array = np.array(data_dict['point_coords'])
+        data_dict['point_coords'] = temp_array
+
+        valid = check_data_validity(data_dict)
+
+        if valid is True:
+
+            st.session_state.data_model = data_dict
+            st.write('Dane wydają się być poprawne')
+        else:
+            st.write('Dane nie przeszły etapu walidacji. Sprawdź czy dane zostały podane poprawnie. Więcej pod ikonką pomocy ')
+
+
+
+    except:
+        st.write('!!! Coś poszło nie tak. Sprawdź czy dane zostały podane poprawnie. Więcej pod ikonką pomocy !!!')
+
 #TODO BUTTON Wczytaj z pliku
 if st.button('Przeładuj data model'):
     st.session_state.data_model = create_data_model()
-
-#TODO FIELD Wstaw plik
 
 # Get some data.
 #data = np.random.randn(10, 2)
@@ -60,8 +109,6 @@ if st.button('Przeładuj data model'):
 #text = st.text_input("Type here")
 
 # ext2 = st.text_input("Type here", key = "last_name")
-
-
 
 
 if st.checkbox('Macierze czasu między punktami'):
@@ -114,7 +161,6 @@ if st.checkbox('Okna czasowe'):
             if window_col4.button('zaktualizuj czas okna'):
                 st.session_state.data_model['time_windows'][time_point_index] = (time_point_start, time_point_stop)
 
-import numpy as np
 
 def add_point_to_data_model(data_model, x, y, tw_start, tw_stop):
     data_model['point_coords'] = np.concatenate((data_model['point_coords'],[[x,y]]), axis=0)
@@ -235,15 +281,33 @@ if st.button('Oblicz trasy'):
 
 if st.button('solution_cost_json'):
     json = solution_cost_json()
-    st.write(json)
+    json_temp = {}
+
+    json_temp['cost']= json
+
+    json_dict = js.dumps(json_temp)
+    st.json(json_dict, expanded=True)
+
+    st.download_button(label="📤 Eksportuj Dane",file_name="solution_cost.json",mime="application/json",data=json_dict)
+
 
 
 if st.button('solution_routes_json'):
     json = solution_routes_json()
-    print(json)
-    st.write(json)
+    
+    json_dict = js.dumps(json)
+    st.json(json_dict, expanded=True)
+
+    st.download_button(label="📤 Eksportuj Dane",file_name="solution_routes.json",mime="application/json",data=json_dict)
+
+
+
 
 
 if st.button('solution_full_json'):
     json = solution_full_json()
-    st.write(json)
+    
+    json_dict = js.dumps(json)
+    st.json(json_dict, expanded=True)
+
+    st.download_button(label="📤 Eksportuj Dane",file_name="solution_full.json",mime="application/json",data=json_dict)
